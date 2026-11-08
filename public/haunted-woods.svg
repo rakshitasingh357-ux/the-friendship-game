@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" shape-rendering="crispEdges">
+  <defs>
+    <linearGradient id="distance" x2="0" y2="1">
+      <stop stop-color="#172923"/>
+      <stop offset=".48" stop-color="#263a2d"/>
+      <stop offset="1" stop-color="#243623"/>
+    </linearGradient>
+    <linearGradient id="trail" x2="0" y2="1">
+      <stop stop-color="#554b35"/>
+      <stop offset="1" stop-color="#302f25"/>
+    </linearGradient>
+    <pattern id="grass" width="32" height="28" patternUnits="userSpaceOnUse">
+      <path d="M3 25v-6l3 3m7 4v-9l3 5m10 3v-6l3 2" fill="none" stroke="#667747" stroke-width="2" opacity=".58"/>
+      <rect x="21" y="5" width="3" height="3" fill="#84915a" opacity=".45"/>
+      <rect x="7" y="7" width="2" height="2" fill="#17261d" opacity=".8"/>
+    </pattern>
+    <pattern id="bark" width="18" height="42" patternUnits="userSpaceOnUse">
+      <rect width="18" height="42" fill="#302b24"/>
+      <path d="M2 0v11h4v8H3v9h5v14M13 0v8h-3v10h4v8h-3v16" fill="none" stroke="#514335" stroke-width="3"/>
+      <path d="M8 3v6M1 33h4M12 30h5" stroke="#171d18" stroke-width="3"/>
+    </pattern>
+    <pattern id="stone" width="20" height="16" patternUnits="userSpaceOnUse">
+      <rect width="20" height="16" fill="#42473a"/>
+      <path d="M0 5h8v4h-5v7M13 0v5h7M10 10h6v6" fill="none" stroke="#697057" stroke-width="2"/>
+    </pattern>
+    <filter id="fog">
+      <feGaussianBlur stdDeviation="13"/>
+    </filter>
+    <filter id="red-glow" x="-.8" y="-.8" width="2.6" height="2.6">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="960" height="540" fill="url(#distance)"/>
+
+  <!-- Far tree silhouettes establish depth behind the walkable floor. -->
+  <g opacity=".62" fill="#18251f">
+    <path d="M0 230V93l20-31 16 18 18-56 24 61 19-17 17 42 21-14 20 73v78H0ZM167 221V79l20-31 22 32 19-58 24 57 21-20 27 44 24-19 18 47v89H167ZM394 226V86l25-43 21 28 20-67 25 61 21-27 21 47 26-19 21 49v111H394ZM638 220V83l18-29 25 24 22-64 25 62 22-25 23 43 23-19 23 52v93H638ZM833 230V92l20-38 22 33 20-62 24 57 20-22 21 49v121H833Z"/>
+    <path d="M30 203h9v93h-9zm70-6h8v101h-8zm125-4h9v96h-9zm195 3h8v101h-8zm75-2h10v103h-10zm183 6h9v95h-9zm218-3h10v98h-10z" fill="#241f1b"/>
+  </g>
+  <g opacity=".42" fill="#35452d">
+    <path d="M0 134 14 112l18 13 20-39 17 28 17-11 20 35 17-11 22 47H0Zm191 11 19-29 21 12 20-46 21 42 19-18 25 37 18-12 21 41H191Zm282-8 20-26 19 13 23-52 21 48 20-17 23 36 21-14 24 44H473Zm284 4 21-29 17 12 23-46 22 41 22-14 20 35 19-13 25 45H757Z"/>
+  </g>
+
+  <path d="M0 224h960v316H0z" fill="#293821"/>
+  <path d="M0 224h960v316H0z" fill="url(#grass)" opacity=".8"/>
+  <path d="M0 281q102-48 205-8t198 12q99-37 183 3t166 15q112-36 208 18v58q-91-30-194-3t-188-4q-100-38-187-6t-184-9Q88 321 0 371Z" fill="#405033" opacity=".58"/>
+
+  <!-- Winding trail links the entrance, campsite, bridge and shrine. -->
+  <path d="M-25 435c119 11 154-22 212-72s87-82 155-73 69 84 137 67 83-77 142-88 88 47 139 68 108 18 225-19v95c-89 40-158 39-244 7s-100-79-142-72-75 81-150 96-121-51-176-41-94 72-177 87-115-7-121-4Z" fill="#1c2a20" opacity=".8"/>
+  <path d="M-25 423c119 11 154-22 212-72s87-82 155-73 69 84 137 67 83-77 142-88 88 47 139 68 108 18 225-19v95c-89 40-158 39-244 7s-100-79-142-72-75 81-150 96-121-51-176-41-94 72-177 87-115-7-121-4Z" fill="url(#trail)"/>
+  <path d="M-5 428q104 5 186-67m26-21q58-63 116-62m44 19q39 34 85 33m31-11q53-68 100-63m42 13q52 49 103 58m45 7q66 19 143-2" fill="none" stroke="#796a47" stroke-width="4" stroke-dasharray="3 12" opacity=".62"/>
+  <path d="M0 365h960v175H0z" fill="url(#grass)" opacity=".35"/>
+
+  <!-- Mid-ground crooked trees; dark trunks and pixel bark are part of the map art. -->
+  <g>
+    <path d="M119 278 125 164 112 123 126 86 119 35 140 74 157 27 155 94 177 59 164 119 179 156 168 279Z" fill="#211f1a"/>
+    <path d="M129 275 135 166 124 126 139 92 135 56 149 93 164 66 153 126 167 161 159 275Z" fill="url(#bark)"/>
+    <path d="m134 142 30-28 25-6-20 16-28 31m-7 32-27-23-15-2 17 14 24 22" fill="none" stroke="#302a22" stroke-width="12"/>
+    <path d="M368 287 373 173 362 136 374 92 370 44 392 82 407 22 409 91 434 57 420 125 438 166 428 286Z" fill="#201e19"/>
+    <path d="M379 284 384 174 374 137 386 99 384 67 397 99 414 57 407 130 423 169 417 284Z" fill="url(#bark)"/>
+    <path d="m388 147 27-27 24-8-16 17-26 25m-13 32-23-18-17-1 18 15 21 18" fill="none" stroke="#302a22" stroke-width="12"/>
+    <path d="M587 282 596 163 585 126 599 85 595 38 616 72 633 19 634 88 658 54 644 120 660 158 650 281Z" fill="#211f1a"/>
+    <path d="M600 279 606 165 596 128 610 92 607 61 622 93 638 56 632 125 646 161 639 279Z" fill="url(#bark)"/>
+    <path d="m611 143 28-28 25-5-18 15-27 24m-13 37-24-20-17 1 17 15 22 19" fill="none" stroke="#302a22" stroke-width="12"/>
+    <path d="M788 290 796 171 783 133 798 92 793 44 815 79 835 20 835 91 860 54 845 123 862 166 850 288Z" fill="#211f1a"/>
+    <path d="M802 287 807 173 796 136 810 100 807 66 822 99 840 58 832 128 848 169 839 286Z" fill="url(#bark)"/>
+    <path d="m810 150 28-29 25-6-19 17-27 23m-12 36-25-20-16 2 17 14 22 20" fill="none" stroke="#302a22" stroke-width="12"/>
+  </g>
+
+  <!-- Interlocking crowns frame a narrow opening through the woods. -->
+  <g fill="#203528" stroke="#17251d" stroke-width="5">
+    <path d="M-20 92 5 64 1 37 29 47 50 14 68 42 98 18 105 53 139 47 129 84 162 106 133 129 146 159 107 164 93 195 61 177 30 201 15 171-15 177Z"/>
+    <path d="M235 74 257 48 251 19 281 31 303 2 321 35 350 20 360 52 391 54 374 82 397 106 364 121 357 151 327 135 299 159 281 129 248 139 254 106 227 91Z"/>
+    <path d="M454 67 477 43 470 14 501 27 522 0 543 31 572 14 581 48 614 53 595 81 619 105 587 122 577 151 546 134 519 159 500 128 468 137 474 103 446 87Z"/>
+    <path d="M666 71 691 45 683 17 715 28 735 0 755 32 785 16 794 50 826 53 808 82 833 105 801 122 793 152 761 135 733 160 715 129 683 138 688 104 658 89Z"/>
+    <path d="M847 86 872 58 865 31 895 41 920 5 938 43 969 28 976 75 990 105 964 130 971 165 936 160 914 191 888 168 859 180 856 145 829 126Z"/>
+  </g>
+  <g fill="#35482f">
+    <path d="m12 77 17-19 15 9 18-31 17 27 24-20 7 28 27-2-10 26 22 17-25 13 4 25-28-5-17 25-21-19-24 19-8-25-27 5 8-27-22-9 22-17Z"/>
+    <path d="m267 66 17-18 17 10 18-28 16 27 22-16 7 24 24 3-13 22 20 18-25 13-6 24-25-10-23 20-15-23-25 9 4-25-22-9 18-16Z"/>
+    <path d="m480 59 18-17 16 9 20-29 17 27 23-15 7 26 25 2-13 22 20 18-25 13-6 25-25-10-23 19-16-22-25 9 5-26-23-9 18-17Z"/>
+    <path d="m698 63 18-19 16 11 20-29 17 28 24-15 6 24 25 2-14 23 19 17-25 14-6 24-25-10-23 19-16-22-25 9 5-26-22-8 18-17Z"/>
+    <path d="m872 79 17-20 17 10 20-30 17 28 23-15 6 27 22 6-14 18 15 20-25 10-7 24-24-11-22 20-17-23-23 7 4-25-21-10 18-17Z"/>
+  </g>
+  <g fill="#4a5935">
+    <rect x="28" y="57" width="17" height="10"/><rect x="62" y="37" width="13" height="10"/><rect x="103" y="62" width="17" height="9"/>
+    <rect x="277" y="48" width="17" height="9"/><rect x="318" y="25" width="13" height="10"/><rect x="349" y="62" width="16" height="9"/>
+    <rect x="492" y="39" width="18" height="9"/><rect x="533" y="23" width="14" height="10"/><rect x="568" y="63" width="16" height="9"/>
+    <rect x="708" y="46" width="18" height="9"/><rect x="750" y="24" width="15" height="10"/><rect x="789" y="64" width="16" height="9"/>
+    <rect x="882" y="60" width="18" height="9"/><rect x="921" y="28" width="14" height="10"/><rect x="947" y="71" width="14" height="9"/>
+  </g>
+
+  <!-- Camp, broken crossing, and shrine landmarks. -->
+  <g>
+    <path d="m295 378 44-53 47 53v25H295Z" fill="#3c4230" stroke="#252820" stroke-width="5"/>
+    <path d="m306 375 33-38 34 38Z" fill="#596044"/>
+    <path d="M338 376v27m-30 0h62" stroke="#9a8353" stroke-width="4"/>
+    <path d="m389 401 13-18 12 18-12 16Z" fill="#a94e31"/>
+    <path d="M397 399h9m-4-10v18" stroke="#f4a54b" stroke-width="3"/>
+    <path d="M520 212h105v14H520zm8 14h12v34h-12zm67 0h12v31h-12zm-58-14-13-12 8-8 17 20m28 0 17-18 9 7-14 18" fill="#574b37"/>
+    <path d="M527 226h90m-71 8h51" stroke="#90754b" stroke-width="3" stroke-dasharray="7 5"/>
+    <path d="m870 393 18-23 19 23v67h-37Z" fill="#49503d" stroke="#242820" stroke-width="5"/>
+    <path d="m876 396 12-15 13 15v55h-25Z" fill="url(#stone)"/>
+    <path d="M868 460h43m-49 10h55m-64 10h71" stroke="#85866a" stroke-width="5"/>
+    <path d="M921 376v-58a25 25 0 0 1 50 0v58h-10v-58a15 15 0 0 0-30 0v58Z" fill="#656b52" stroke="#242820" stroke-width="4"/>
+    <path d="M934 375v-57a12 12 0 0 1 24 0v57Z" fill="#17231c"/>
+    <path d="M931 331h30m-30 12h30m-30 12h30" stroke="#8c8059" stroke-width="4"/>
+    <path d="M918 378h56m-61 8h66" stroke="#85866a" stroke-width="5"/>
+    <path d="M889 408v26m-8-13h16" stroke="#b3a774" stroke-width="3"/>
+  </g>
+
+  <!-- Cobwebs strung between the crooked branches. -->
+  <g fill="none" stroke="#b9bca1" stroke-width="1.5" opacity=".66">
+    <path d="M164 109q36 8 50 38m-50-38q20 23 26 42m-26-42q36 26 50 38m-50-38q29 1 50 38"/>
+    <path d="M412 102q28 8 45 35m-45-35q17 19 23 39m-23-39q28 21 45 35m-45-35q25 1 45 35"/>
+    <path d="M640 112q28 4 46 32m-46-32q18 17 24 37m-24-37q30 21 46 32m-46-32q26-2 46 32"/>
+    <path d="M842 113q28 5 44 34m-44-34q17 19 23 40m-23-40q28 19 44 34"/>
+  </g>
+
+  <!-- Hiding brush surrounds the walkable trail; red eyes are tucked inside it. -->
+  <g fill="#1d3022" stroke="#15231b" stroke-width="4">
+    <path d="m173 313 13-20 15 9 18-27 18 19 22-17 12 23 28 2 2 23-17 18-30-7-18 16-22-16-30 8-15-13Z"/>
+    <path d="m444 354 15-22 17 9 18-29 20 20 23-17 12 25 26 1 4 25-22 15-27-7-18 17-23-17-31 9-14-15Z"/>
+    <path d="m666 317 16-23 18 11 19-29 19 21 23-18 14 25 27 3 2 23-20 17-29-7-19 17-23-17-31 9-14-15Z"/>
+    <path d="m819 320 15-22 17 10 18-27 19 19 22-18 15 25 25 2 4 24-22 15-27-7-18 17-23-16-29 8-15-15Z"/>
+  </g>
+  <g fill="#34472c">
+    <rect x="190" y="302" width="16" height="9"/><rect x="232" y="291" width="18" height="10"/><rect x="270" y="315" width="18" height="9"/>
+    <rect x="460" y="344" width="17" height="9"/><rect x="504" y="332" width="18" height="10"/><rect x="544" y="358" width="17" height="9"/>
+    <rect x="685" y="305" width="18" height="9"/><rect x="730" y="294" width="18" height="10"/><rect x="773" y="317" width="17" height="9"/>
+    <rect x="838" y="309" width="17" height="9"/><rect x="882" y="298" width="17" height="10"/><rect x="921" y="322" width="18" height="9"/>
+  </g>
+  <g fill="#ff514c" filter="url(#red-glow)">
+    <rect x="218" y="315" width="7" height="4"/><rect x="231" y="315" width="7" height="4"/>
+    <rect x="493" y="357" width="7" height="4"/><rect x="506" y="357" width="7" height="4"/>
+    <rect x="720" y="319" width="7" height="4"/><rect x="733" y="319" width="7" height="4"/>
+    <rect x="876" y="322" width="7" height="4"/><rect x="889" y="322" width="7" height="4"/>
+  </g>
+  <g fill="#f35a50">
+    <animate attributeName="opacity" values=".48;1;.48" dur="3.8s" repeatCount="indefinite"/>
+    <rect x="78" y="286" width="3" height="3"/><rect x="281" y="216" width="3" height="3"/>
+    <rect x="463" y="268" width="3" height="3"/><rect x="693" y="211" width="3" height="3"/>
+    <rect x="747" y="424" width="3" height="3"/><rect x="943" y="249" width="3" height="3"/>
+    <rect x="150" y="459" width="3" height="3"/><rect x="572" y="477" width="3" height="3"/>
+  </g>
+
+  <!-- Loose stones, fallen branches and lush foreground grass. -->
+  <g fill="url(#stone)" stroke="#242b20" stroke-width="3">
+    <path d="m84 333 16-11 17 6 7 15-18 9-19-4Z"/>
+    <path d="m384 455 19-12 21 4 8 15-21 10-23-5Z"/>
+    <path d="m636 376 17-12 20 6 7 14-20 8-22-5Z"/>
+    <path d="m814 446 17-10 22 4 6 16-18 10-24-5Z"/>
+  </g>
+  <g fill="none" stroke="#382f25" stroke-width="8" stroke-linecap="square">
+    <path d="m245 445 38-17 18 8 28-22m-44 17 11 16"/>
+    <path d="m678 461 34-18 17 8 28-23m-36 19 8 17"/>
+  </g>
+  <g fill="#53663a">
+    <path d="m0 540 12-49 9 28 13-39 9 52 18-40 8 48 23-35 5 35 18-42 9 42Zm841 0 15-43 11 26 14-39 12 55 18-46 8 47 19-32 6 32 16-44 10 44Z"/>
+    <path d="m20 540 12-32 8 32m871 0 12-36 9 36m-65 0 12-29 8 29"/>
+  </g>
+
+  <!-- Low drifting layers of mist, leaving the central trail legible. -->
+  <g fill="#a6b59b" opacity=".15" filter="url(#fog)">
+    <path d="M-20 235q95-36 196 0t194 0 194 0 194 0 194 0v44q-99-23-194 0t-194 0-194 0-194 0-196 0Z"/>
+    <path d="M-20 330q116-28 220 0t209 0 209 0 209 0 153 0v36q-84-17-153 0t-209 0-209 0-209 0-220 0Z"/>
+  </g>
+</svg>

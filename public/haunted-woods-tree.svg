@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="185" height="360" viewBox="0 0 185 360" shape-rendering="crispEdges">
+  <defs>
+    <pattern id="foliage" width="52" height="44" patternUnits="userSpaceOnUse">
+      <rect x="4" y="8" width="20" height="12" fill="#18354b"/>
+      <rect x="28" y="2" width="17" height="11" fill="#24445a"/>
+      <rect x="24" y="23" width="24" height="13" fill="#152d41"/>
+      <rect x="2" y="28" width="16" height="10" fill="#315166"/>
+      <rect x="14" y="18" width="9" height="8" fill="#456477"/>
+    </pattern>
+  </defs>
+  <path d="M68 348 78 132 60 93 76 56 70 20 95 56 117 8 118 63 148 35 132 98 151 132 139 350Z" fill="#101c2a"/>
+  <path d="M82 344 91 139 77 99 91 66 88 42 103 69 121 35 119 103 137 139 127 344Z" fill="#293d4c"/>
+  <path d="m96 141 49-41 36-9-29 28-49 37m-12 33-44-31-27-1 33 23 37 31" fill="none" stroke="#1b2b39" stroke-width="16"/>
+  <path d="M4 99 25 68 20 38 53 51 77 12 96 48 124 27 134 63 169 66 153 97 178 122 146 140 138 172 106 155 79 181 59 151 28 160 31 127 0 113Z" fill="#0c1a29" stroke="#101c2a" stroke-width="7"/>
+  <path d="m23 91 19-24 18 10 18-34 19 29 24-19 8 29 26 1-13 25 21 18-25 13-7 24-26-10-23 20-16-23-27 9 4-26-23-9 19-17Z" fill="url(#foliage)"/>
+  <path d="M47 70h18v8H47m46-29h14v8H93m18 68h21v8h-21m-72-9h16v8H39" fill="#7892a0" opacity=".55"/>
+</svg>

@@ -1,0 +1,12 @@
+{
+  "title": "The Friendship Game",
+  "description": "Experience a personalized birthday adventure through a gamified website that celebrates friendship with interactive memories, quizzes, and heartfelt messages.",
+  "language": "en",
+  "robots": {
+    "index": true
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
