@@ -3284,3 +3284,190 @@ button { touch-action: manipulation; }
   overflow: visible !important;
   min-height: auto;
 }
+/* Haunted Woods: visible analogue joystick and touch layout for phones/tablets */
+@media (pointer: coarse) {
+  .haunted-touch-controls {
+    display: block;
+    position: absolute;
+    z-index: 20;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .haunted-joystick-container {
+    position: absolute;
+    left: max(14px, env(safe-area-inset-left));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 124px;
+    pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .haunted-joystick {
+    position: relative;
+    display: block;
+    width: 112px;
+    height: 112px;
+    flex: none;
+    overflow: hidden;
+    border: 2px solid rgba(208, 225, 238, .62);
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 45%, rgba(112, 143, 166, .32), rgba(18, 31, 47, .82) 68%),
+      rgba(14, 25, 39, .76);
+    box-shadow: 0 0 0 5px rgba(185, 208, 224, .08), inset 0 0 22px rgba(188, 218, 235, .12), 0 8px 24px rgba(0, 0, 0, .38);
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    cursor: grab;
+  }
+
+  .haunted-joystick:active { cursor: grabbing; }
+
+  .haunted-joystick::before {
+    content: "";
+    position: absolute;
+    inset: 13px;
+    border: 1px dashed rgba(216, 231, 242, .3);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .haunted-joystick-arrows span {
+    position: absolute;
+    z-index: 1;
+    color: rgba(225, 237, 246, .7);
+    font: 700 13px/1 Arial, sans-serif;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, .8);
+    pointer-events: none;
+  }
+
+  .haunted-joystick-arrows span:nth-child(1) { top: 9px; left: 50%; transform: translateX(-50%); }
+  .haunted-joystick-arrows span:nth-child(2) { left: 9px; top: 50%; transform: translateY(-50%); }
+  .haunted-joystick-arrows span:nth-child(3) { right: 9px; top: 50%; transform: translateY(-50%); }
+  .haunted-joystick-arrows span:nth-child(4) { bottom: 9px; left: 50%; transform: translateX(-50%); }
+
+  .haunted-joystick-knob {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    width: 42px;
+    height: 42px;
+    margin: -21px 0 0 -21px;
+    border: 2px solid rgba(245, 241, 255, .82);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #d9e8f0, #8299ad 58%, #42586d 100%);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .48), 0 0 15px rgba(177, 207, 231, .32);
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  .joystick-caption {
+    color: rgba(237, 231, 246, .9);
+    font: 700 8px/1.2 var(--font-pixel);
+    letter-spacing: .16em;
+    text-shadow: 0 2px 5px #000;
+    pointer-events: none;
+  }
+
+  .haunted-action-buttons {
+    position: absolute;
+    right: max(14px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: repeat(2, minmax(64px, 76px));
+    gap: 6px;
+    pointer-events: auto;
+  }
+
+  .haunted-action-buttons .touch-action {
+    min-width: 0;
+    min-height: 42px;
+    padding: 7px 5px;
+    border: 1px solid rgba(210, 225, 238, .3);
+    border-radius: 9px;
+    background: linear-gradient(180deg, rgba(49, 62, 76, .92), rgba(17, 27, 40, .94));
+    color: #f4f0fa;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .3), inset 0 1px rgba(255, 255, 255, .08);
+    font: 700 7px/1.35 var(--font-pixel);
+    letter-spacing: .04em;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .haunted-action-buttons .touch-action:disabled {
+    opacity: .38;
+    filter: grayscale(.5);
+  }
+
+  .haunted-action-buttons .touch-action.interact { border-color: rgba(167, 210, 192, .58); }
+  .haunted-action-buttons .touch-action.hide { border-color: rgba(190, 171, 226, .52); }
+  .haunted-action-buttons .touch-action.sprint { border-color: rgba(226, 190, 137, .58); }
+  .haunted-action-buttons .touch-action.pause { border-color: rgba(210, 216, 226, .38); }
+
+  .haunted-status {
+    bottom: max(150px, calc(env(safe-area-inset-bottom) + 140px));
+    width: min(520px, calc(100% - 300px));
+    min-width: 180px;
+    padding: 8px 11px;
+    font-size: 10px;
+  }
+
+  .haunted-guidance { font-size: 9px; }
+  .haunted-dpad { display: none !important; }
+}
+
+@media (pointer: coarse) and (max-width: 640px) {
+  .haunted-joystick-container {
+    left: max(9px, env(safe-area-inset-left));
+    bottom: max(9px, env(safe-area-inset-bottom));
+    width: 108px;
+  }
+
+  .haunted-joystick { width: 98px; height: 98px; }
+  .haunted-joystick-knob { width: 38px; height: 38px; margin: -19px 0 0 -19px; }
+  .haunted-joystick-arrows span { font-size: 11px; }
+
+  .haunted-action-buttons {
+    right: max(9px, env(safe-area-inset-right));
+    bottom: max(9px, env(safe-area-inset-bottom));
+    grid-template-columns: repeat(2, minmax(56px, 66px));
+    gap: 5px;
+  }
+
+  .haunted-action-buttons .touch-action {
+    min-height: 38px;
+    padding: 6px 3px;
+    font-size: 6px;
+  }
+
+  .haunted-status {
+    left: 12px;
+    right: 12px;
+    bottom: max(140px, calc(env(safe-area-inset-bottom) + 132px));
+    width: auto;
+    min-width: 0;
+    padding: 7px 9px;
+    transform: none;
+    font-size: 9px;
+  }
+
+  .haunted-status strong,
+  .haunted-guidance b { font-size: 8px; }
+  .haunted-guidance { font-size: 8px; }
+}
+
+@media (pointer: coarse) and (max-height: 480px) {
+  .haunted-joystick-container { width: 94px; }
+  .haunted-joystick { width: 84px; height: 84px; }
+  .haunted-joystick-knob { width: 34px; height: 34px; margin: -17px 0 0 -17px; }
+  .haunted-action-buttons { grid-template-columns: repeat(2, minmax(54px, 66px)); gap: 4px; }
+  .haunted-action-buttons .touch-action { min-height: 34px; font-size: 6px; }
+  .haunted-status { bottom: max(116px, calc(env(safe-area-inset-bottom) + 108px)); padding: 6px 8px; }
+  .haunted-guidance { display: none; }
+}
