@@ -92,7 +92,7 @@ const FRIENDSHIP_MUSIC = "/music/nalyver-playful-cute-fun-remastered-614983.mp3"
 const CELESTIAL_MUSIC = "/celestial/kulakovka-dark-cinematic-620558.mp3";
 const MUSIC_PREFERENCE_KEY = "friendship-game-music-v1";
 const DEFAULT_MUSIC_VOLUME = 0.16;
-const MAX_MUSIC_VOLUME = 0.3;
+const MAX_MUSIC_VOLUME = 1;
 
 type MusicPreference = { enabled: boolean; volume: number };
 type MusicStatus = "ready" | "playing" | "unavailable";
@@ -108,8 +108,8 @@ function loadMusicPreference(): MusicPreference {
     return {
       enabled: typeof parsed.enabled === "boolean" ? parsed.enabled : true,
       volume: typeof parsed.volume === "number" && Number.isFinite(parsed.volume)
-        ? Math.max(0, Math.min(MAX_MUSIC_VOLUME, parsed.volume))
-        : DEFAULT_MUSIC_VOLUME,
+        ? Math.max(0, Math.min(1, parsed.volume <= 0.3 ? parsed.volume / 0.3 : parsed.volume))
+        : DEFAULT_MUSIC_VOLUME / 0.3,
     };
   } catch {
     return { enabled: true, volume: DEFAULT_MUSIC_VOLUME };
@@ -227,7 +227,7 @@ class GameAudio {
   setMusicVolume(volume: number) {
     this.musicVolume = Math.max(0, Math.min(MAX_MUSIC_VOLUME, volume));
     const target = this.effectiveMusicVolume() * (this.activeEffect ? 0.22 : 1);
-    this.setMusicVolumeTarget(target, this.activeEffect ? 220 : 0);
+    this.setMusicVolumeTarget(target, 0);
   }
 
   setMusicDucked(ducked: boolean) {
@@ -473,7 +473,7 @@ function MusicControl({ enabled, status, volume, onToggle, onVolumeChange }: {
     </div>
     <label className="music-volume">
       <span>VOLUME</span>
-      <input type="range" min="0" max="100" value={Math.round(volume / MAX_MUSIC_VOLUME * 100)} onChange={(event) => onVolumeChange(Number(event.target.value) / 100 * MAX_MUSIC_VOLUME)} aria-label="Background music volume" />
+      <input type="range" min="0" max="100" step="1" value={Math.round(volume / MAX_MUSIC_VOLUME * 100)} onInput={(event) => onVolumeChange(Number(event.currentTarget.value) / 100)} onChange={(event) => onVolumeChange(Number(event.currentTarget.value) / 100)} aria-label="Background music volume" />
     </label>
   </aside>;
 }
@@ -700,11 +700,13 @@ const hauntedObstacles = [
 ];
 const hauntedPlayerObstacles = [
   ...hauntedObstacles,
+  // Only the narrow lower trunk/base is solid. The canopy and branches are decorative
+  // and must not create invisible walls across the walking trail.
   ...hauntedTrees.map((tree) => ({
-    x: tree.x + 76 * tree.scale,
-    y: tree.y + 265 * tree.scale,
-    w: 64 * tree.scale,
-    h: 88 * tree.scale,
+    x: tree.x + 91 * tree.scale,
+    y: tree.y + 320 * tree.scale,
+    w: 38 * tree.scale,
+    h: 32 * tree.scale,
   })),
   { x: 520, y: 190, w: 105, h: 72 },
   { x: 295, y: 326, w: 90, h: 76 }, { x: 386, y: 380, w: 38, h: 42 },
@@ -1422,10 +1424,14 @@ function HauntedForestScreen({ onMap, game, onMusicTrack, audio, musicVolume }: 
           hauntedTerrainContext.lineWidth = 170;
           return hauntedTerrainContext.isPointInStroke(hauntedDetourPath, pointX, pointY);
         };
-        if (!onTrail(x - 6, feetY) || !onTrail(x + 6, feetY) || !onTrail(x, feetY + 2)) return false;
+        // Test the character's actual foot anchor against the walkable trail.
+        // Requiring both side points to remain inside the painted path made the
+        // character snag on bends and narrow sections despite a clear centre path.
+        if (!onTrail(x, feetY)) return false;
+        // Keep genuine object collisions, using a small foot-sized footprint.
         return !hauntedPlayerObstacles.some((obstacle) => obstacleIsSolid(obstacle) &&
-          x + 7 > obstacle.x && x - 7 < obstacle.x + obstacle.w &&
-          feetY + 2 > obstacle.y && feetY - 5 < obstacle.y + obstacle.h
+          x + 4 > obstacle.x && x - 4 < obstacle.x + obstacle.w &&
+          feetY + 2 > obstacle.y && feetY - 2 < obstacle.y + obstacle.h
         );
       };
 
