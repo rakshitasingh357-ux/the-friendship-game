@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import "./fight-club.css";
 import LevelFour from "./LevelFour";
 import InstructionGuide, { type InstructionPage } from "./InstructionGuide";
@@ -90,9 +90,11 @@ const letterParagraphs = letterBody.trim().split(/\n\s*\n/);
 
 const FRIENDSHIP_MUSIC = "/music/nalyver-playful-cute-fun-remastered-614983.mp3";
 const CELESTIAL_MUSIC = "/celestial/kulakovka-dark-cinematic-620558.mp3";
-const MUSIC_PREFERENCE_KEY = "friendship-game-music-v1";
-const DEFAULT_MUSIC_VOLUME = 0.16;
+const MUSIC_PREFERENCE_KEY = "friendship-game-music-v2";
+const LEGACY_MUSIC_PREFERENCE_KEY = "friendship-game-music-v1";
+const DEFAULT_MUSIC_VOLUME = 0.35;
 const MAX_MUSIC_VOLUME = 1;
+const LEGACY_MAX_MUSIC_VOLUME = 0.3;
 
 type MusicPreference = { enabled: boolean; volume: number };
 type MusicStatus = "ready" | "playing" | "unavailable";
@@ -103,13 +105,24 @@ const MusicPanelContext = createContext<MusicPanelContextValue | null>(null);
 function loadMusicPreference(): MusicPreference {
   try {
     const saved = window.localStorage.getItem(MUSIC_PREFERENCE_KEY);
-    if (!saved) return { enabled: true, volume: DEFAULT_MUSIC_VOLUME };
-    const parsed = JSON.parse(saved) as Partial<MusicPreference>;
+    if (saved) {
+      const parsed = JSON.parse(saved) as Partial<MusicPreference>;
+      return {
+        enabled: typeof parsed.enabled === "boolean" ? parsed.enabled : true,
+        volume: typeof parsed.volume === "number" && Number.isFinite(parsed.volume)
+          ? Math.max(0, Math.min(MAX_MUSIC_VOLUME, parsed.volume))
+          : DEFAULT_MUSIC_VOLUME,
+      };
+    }
+
+    const legacySaved = window.localStorage.getItem(LEGACY_MUSIC_PREFERENCE_KEY);
+    if (!legacySaved) return { enabled: true, volume: DEFAULT_MUSIC_VOLUME };
+    const parsed = JSON.parse(legacySaved) as Partial<MusicPreference>;
     return {
       enabled: typeof parsed.enabled === "boolean" ? parsed.enabled : true,
       volume: typeof parsed.volume === "number" && Number.isFinite(parsed.volume)
-        ? Math.max(0, Math.min(1, parsed.volume <= 0.3 ? parsed.volume / 0.3 : parsed.volume))
-        : DEFAULT_MUSIC_VOLUME / 0.3,
+        ? Math.max(0, Math.min(MAX_MUSIC_VOLUME, parsed.volume / LEGACY_MAX_MUSIC_VOLUME))
+        : DEFAULT_MUSIC_VOLUME,
     };
   } catch {
     return { enabled: true, volume: DEFAULT_MUSIC_VOLUME };
@@ -227,6 +240,7 @@ class GameAudio {
   setMusicVolume(volume: number) {
     this.musicVolume = Math.max(0, Math.min(MAX_MUSIC_VOLUME, volume));
     const target = this.effectiveMusicVolume() * (this.activeEffect ? 0.22 : 1);
+    // A volume slider should respond immediately rather than waiting for a fade.
     this.setMusicVolumeTarget(target, 0);
   }
 
@@ -473,7 +487,15 @@ function MusicControl({ enabled, status, volume, onToggle, onVolumeChange }: {
     </div>
     <label className="music-volume">
       <span>VOLUME</span>
-      <input type="range" min="0" max="100" step="1" value={Math.round(volume / MAX_MUSIC_VOLUME * 100)} onInput={(event) => onVolumeChange(Number(event.currentTarget.value) / 100)} onChange={(event) => onVolumeChange(Number(event.currentTarget.value) / 100)} aria-label="Background music volume" />
+      <input
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        value={Math.round(volume / MAX_MUSIC_VOLUME * 100)}
+        onChange={(event) => onVolumeChange(Number(event.currentTarget.value) / 100 * MAX_MUSIC_VOLUME)}
+        aria-label="Background music volume"
+      />
     </label>
   </aside>;
 }
@@ -879,6 +901,63 @@ function HauntedForestScreen({ onMap, game, onMusicTrack, audio, musicVolume }: 
   const [characterAction, setCharacterAction] = useState<"idle" | "interacting" | "collecting" | "using" | "startled">("idle");
   const characterActionTimer = useRef<number | null>(null);
   const keys = useRef({ up: false, down: false, left: false, right: false, sprint: false });
+  const joystickRef = useRef<HTMLDivElement | null>(null);
+  const joystickPointer = useRef<number | null>(null);
+  const joystickInput = useRef({ x: 0, y: 0 });
+  const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
+
+  const updateJoystick = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const joystick = joystickRef.current;
+    if (!joystick) return;
+
+    const rect = joystick.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const maxDistance = Math.max(1, rect.width * 0.32);
+    const dx = event.clientX - centerX;
+    const dy = event.clientY - centerY;
+    const distance = Math.hypot(dx, dy);
+    const scale = distance > maxDistance ? maxDistance / distance : 1;
+    const x = dx * scale;
+    const y = dy * scale;
+
+    setJoystickPosition({ x, y });
+
+    const inputX = x / maxDistance;
+    const inputY = y / maxDistance;
+    const inputMagnitude = Math.hypot(inputX, inputY);
+    const deadZone = 0.12;
+    const strength = inputMagnitude <= deadZone ? 0 : (inputMagnitude - deadZone) / (1 - deadZone);
+    joystickInput.current = inputMagnitude === 0
+      ? { x: 0, y: 0 }
+      : { x: inputX / inputMagnitude * strength, y: inputY / inputMagnitude * strength };
+  };
+
+  const stopJoystick = (pointerId?: number) => {
+    const activePointer = joystickPointer.current;
+    if (activePointer === null || (pointerId !== undefined && activePointer !== pointerId)) return;
+    joystickPointer.current = null;
+    joystickInput.current = { x: 0, y: 0 };
+    if (joystickRef.current?.hasPointerCapture(activePointer)) {
+      joystickRef.current.releasePointerCapture(activePointer);
+    }
+    setJoystickPosition({ x: 0, y: 0 });
+  };
+
+  const handleJoystickPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (showTutorial || paused || gameOver || victory || mapOpen || joystickPointer.current !== null) return;
+    event.preventDefault();
+    joystickPointer.current = event.pointerId;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    updateJoystick(event);
+  };
+
+  const handleJoystickPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (joystickPointer.current !== event.pointerId) return;
+    event.preventDefault();
+    updateJoystick(event);
+  };
+
   const playerRef = useRef(player);
   const ghostsRef = useRef(ghosts);
   const catRef = useRef(cat);
@@ -894,6 +973,9 @@ function HauntedForestScreen({ onMap, game, onMusicTrack, audio, musicVolume }: 
   useEffect(() => { foundRef.current = found; }, [found]);
   useEffect(() => { warningRef.current = warning; }, [warning]);
   useEffect(() => { guidanceRef.current = guidance; }, [guidance]);
+  useEffect(() => {
+    if (showTutorial || paused || gameOver || victory || mapOpen) stopJoystick();
+  }, [showTutorial, paused, gameOver, victory, mapOpen]);
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
@@ -986,10 +1068,6 @@ function HauntedForestScreen({ onMap, game, onMusicTrack, audio, musicVolume }: 
     const timer = window.setTimeout(() => setBellPulse((value) => Math.max(0, value - 1)), 260);
     return () => window.clearTimeout(timer);
   }, [bellPulse]);
-
-  const setMovement = (direction: "up" | "down" | "left" | "right", pressed: boolean) => {
-    keys.current[direction] = pressed;
-  };
 
   const startAmbientAudio = useCallback(() => {
     if (!audio || !("AudioContext" in window) || ambientAudio.current) return;
@@ -1402,8 +1480,8 @@ function HauntedForestScreen({ onMap, game, onMusicTrack, audio, musicVolume }: 
     const interval = window.setInterval(() => {
       const currentPlayer = playerRef.current;
       const nextPlayer = { ...currentPlayer };
-      const moveX = (keys.current.right ? 1 : 0) - (keys.current.left ? 1 : 0);
-      const moveY = (keys.current.down ? 1 : 0) - (keys.current.up ? 1 : 0);
+      const moveX = Math.max(-1, Math.min(1, (keys.current.right ? 1 : 0) - (keys.current.left ? 1 : 0) + joystickInput.current.x));
+      const moveY = Math.max(-1, Math.min(1, (keys.current.down ? 1 : 0) - (keys.current.up ? 1 : 0) + joystickInput.current.y));
       const obstacleIsSolid = (obstacle: { x: number; y: number; w: number; h: number }) => {
         if (gateOpen && obstacle.x === 2380) return false;
         if (mechanismOpen && obstacle.x === 6510) return false;
@@ -1436,8 +1514,8 @@ function HauntedForestScreen({ onMap, game, onMusicTrack, audio, musicVolume }: 
       };
 
       if (moveX || moveY) {
-        const step = keys.current.sprint ? 5.2 : 3.4;
         const magnitude = Math.hypot(moveX, moveY);
+        const step = (keys.current.sprint ? 5.2 : 3.4) * Math.min(1, magnitude);
         const deltaX = (moveX / magnitude) * step;
         const deltaY = (moveY / magnitude) * step;
         const substeps = Math.ceil(Math.max(Math.abs(deltaX), Math.abs(deltaY)) / 2);
@@ -1911,11 +1989,31 @@ function HauntedForestScreen({ onMap, game, onMusicTrack, audio, musicVolume }: 
     )}
 
     <div className="haunted-touch-controls" aria-label="Touch controls for the haunted woods">
-      <div className="haunted-dpad">
-        <button type="button" className="touch-direction up" onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setMovement("up", true); }} onPointerUp={() => setMovement("up", false)} onPointerLeave={() => setMovement("up", false)} onPointerCancel={() => setMovement("up", false)}>↑</button>
-        <button type="button" className="touch-direction left" onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setMovement("left", true); }} onPointerUp={() => setMovement("left", false)} onPointerLeave={() => setMovement("left", false)} onPointerCancel={() => setMovement("left", false)}>←</button>
-        <button type="button" className="touch-direction down" onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setMovement("down", true); }} onPointerUp={() => setMovement("down", false)} onPointerLeave={() => setMovement("down", false)} onPointerCancel={() => setMovement("down", false)}>↓</button>
-        <button type="button" className="touch-direction right" onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setMovement("right", true); }} onPointerUp={() => setMovement("right", false)} onPointerLeave={() => setMovement("right", false)} onPointerCancel={() => setMovement("right", false)}>→</button>
+      <div className="haunted-joystick-container">
+        <div
+          ref={joystickRef}
+          className="haunted-joystick"
+          onPointerDown={handleJoystickPointerDown}
+          onPointerMove={handleJoystickPointerMove}
+          onPointerUp={(event) => stopJoystick(event.pointerId)}
+          onPointerCancel={(event) => stopJoystick(event.pointerId)}
+          onLostPointerCapture={(event) => stopJoystick(event.pointerId)}
+          style={{ touchAction: "none" }}
+          role="application"
+          aria-label="Movement joystick"
+        >
+          <div className="haunted-joystick-arrows" aria-hidden="true">
+            <span>▲</span>
+            <span>◀</span>
+            <span>▶</span>
+            <span>▼</span>
+          </div>
+          <div
+            className="haunted-joystick-knob"
+            style={{ transform: `translate(${joystickPosition.x}px, ${joystickPosition.y}px)` }}
+          />
+        </div>
+        <span className="joystick-caption">MOVE</span>
       </div>
       <div className="haunted-action-buttons">
         <button type="button" className="touch-action interact" onClick={interactWithNearest} disabled={!nearbyHauntedInteraction?.inRange}>E / INTERACT</button>
@@ -2314,7 +2412,7 @@ function QuizScreen({ onMap, onComplete, audio, toggleAudio, game, startDirectly
     const wrong = [0, 1, 2, 3].filter((i) => i !== questions[current].answer).slice(0, 2);
     setHidden(wrong);
   };
-  const shell = (content: React.ReactNode, title = "BOSS BATTLE") => <LevelShell level="03" title={title} subtitle="The Keeper of Obscure Memories" onMap={onMap} audio={audio} toggleAudio={toggleAudio} game={game} tone="battle-level">{content}</LevelShell>;
+const shell = (content: React.ReactNode, title = "BOSS BATTLE") => <LevelShell level="03" title={title} subtitle="The Keeper of Obscure Memories" onMap={onMap} audio={audio} toggleAudio={toggleAudio} game={game} tone="battle-level level-three-scroll">{content}</LevelShell>;
   if (mode === "intro") return shell(<section className="boss-intro"><div className="boss-alert">WARNING: BOSS APPROACHING</div><BossFigure /><div className="boss-copy"><span>FINAL BOSS</span><h2>THE KEEPER OF<br />OBSCURE MEMORIES</h2><p>Four editable rounds. Correct answers deal damage. Wrong answers cost a heart. Hints cost 50 friendship XP.</p><Button onClick={reset} icon="sword">ENTER THE ARENA</Button></div></section>);
   if (mode === "lost") return shell(<section className="results-card defeat-card"><span className="result-trophy"><PixelHeart filled={false} /></span><small>PARTY DEFEATED</small><h2>THE LORE FOUGHT BACK.</h2><p>No friendship was harmed. The Keeper has agreed to a rematch.</p><div className="button-pair"><Button onClick={reset}>RETRY BATTLE</Button><Button variant="secondary" onClick={onMap}>RETREAT TO MAP</Button></div></section>, "TRY AGAIN");
   if (mode === "reveal") return shell(<section className="boss-reveal"><BossFigure friendly /><div><span>BOSS TRANSFORMATION COMPLETE</span><h2>THE KEEPER WAS<br />A FRIEND ALL ALONG.</h2><blockquote>"YOU HAVE DEFEATED THE FINAL BOSS. BUT THE REAL TREASURE WAS THE FRIENDSHIP ALL ALONG."</blockquote><Button onClick={() => setMode("results")}>CLAIM THE BOSS KEY</Button></div></section>, "BOSS DEFEATED");
@@ -2725,7 +2823,7 @@ export default function App() {
     toggle: () => setIsMusicPanelOpen((open) => !open),
   }), [isMusicPanelOpen]);
   return <MusicPanelContext.Provider value={musicPanelContext}>
-    <div className="game-viewport" inert={isPortrait && !portraitInstructionsAvailable} aria-hidden={isPortrait && !portraitInstructionsAvailable}>{view}</div>
+    <div className={`game-viewport ${screen === "lore" ? "game-viewport-level-three" : ""}`} inert={isPortrait && !portraitInstructionsAvailable} aria-hidden={isPortrait && !portraitInstructionsAvailable}>{view}</div>
     <div className={`orientation-overlay ${isPortrait && !portraitInstructionsAvailable ? "active" : ""}`} role="status" aria-live="polite">
       <div className="orientation-card">
         <span className="orientation-icon" aria-hidden="true"><i /></span>

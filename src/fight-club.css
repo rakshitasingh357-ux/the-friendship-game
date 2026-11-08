@@ -127,3 +127,11 @@
   .fight-ending-characters .fighter { --fighter-scale:.64; }
   .fight-ending-characters .versus-mark { margin-bottom:58px; }
 }
+/* Level 3 only: enable vertical scrolling */
+.level-three-scroll {
+  height: auto;
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 40px;
+}

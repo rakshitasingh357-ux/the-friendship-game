@@ -2507,20 +2507,6 @@ button { touch-action: manipulation; }
   overflow: hidden;
 }
 
-/* Level 3 only: allow vertical scrolling */
-.level-screen.battle-level {
-  height: auto;
-  min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-.level-screen.battle-level > section {
-  overflow: visible;
-  min-height: max-content;
-  flex-shrink: 0;
-}
-
 .letter-scene {
   padding: 12px;
 }
@@ -3281,4 +3267,20 @@ button { touch-action: manipulation; }
 
 @media (prefers-reduced-motion: reduce) {
   .interaction-guide { animation: none; }
+}
+/* FIX: Level 3 Boss Battle scrolling */
+.game-viewport > main.level-screen.level-three-scroll {
+  height: 100%;
+  max-height: none;
+  min-height: 100%;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  display: block;
+  padding-bottom: 40px;
+  overscroll-behavior-y: contain;
+}
+
+.game-viewport > main.level-screen.level-three-scroll > section {
+  overflow: visible !important;
+  min-height: auto;
 }
