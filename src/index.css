@@ -2507,6 +2507,20 @@ button { touch-action: manipulation; }
   overflow: hidden;
 }
 
+/* Level 3 only: allow vertical scrolling */
+.level-screen.battle-level {
+  height: auto;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.level-screen.battle-level > section {
+  overflow: visible;
+  min-height: max-content;
+  flex-shrink: 0;
+}
+
 .letter-scene {
   padding: 12px;
 }
